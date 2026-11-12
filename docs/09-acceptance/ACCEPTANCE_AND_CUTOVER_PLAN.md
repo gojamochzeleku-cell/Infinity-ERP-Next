@@ -986,6 +986,25 @@ Every exception must have:
 
 Critical unresolved exceptions block acceptance.
 
+## 26.8 Administrative privilege reconciliation
+
+Verify:
+
+- The designated existing admin account is matched using its
+  approved stable source identifier.
+- The target account has Django `is_superuser=False`.
+- Its active company-specific ADMIN memberships in YAH and CHI
+  are preserved.
+- No unrestricted system-wide Django superuser account remains.
+- No SUPERADMIN business role exists.
+- Before-and-after privilege and membership evidence is recorded.
+- No unrelated account memberships or company roles were changed
+  as part of the privilege migration.
+
+Failure to meet these conditions blocks security and migration
+acceptance. Verification must use controlled migration evidence
+and must not require unauthorized production changes.
+
 # 27. PERFORMANCE ACCEPTANCE
 
 Performance targets must be agreed before formal acceptance.

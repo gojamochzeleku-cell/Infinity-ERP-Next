@@ -470,6 +470,25 @@ SUPERADMIN must not be created as part of migration.
 The existing Django administrative privilege state must not be
 changed during discovery or migration without explicit approval.
 
+For the approved target authorization model, the existing admin
+account must have Django `is_superuser=False`. Its active,
+company-specific ADMIN memberships in YAH and CHI must be preserved.
+
+Before any authorized privilege migration:
+
+- Verify the exact source account identity using a stable account
+  identifier.
+- Verify and record its existing YAH and CHI ADMIN memberships.
+- Change only the Django superuser privilege; do not remove or
+  broaden either company membership.
+- Record the before-and-after privilege state and membership evidence.
+- Reconcile the resulting account and memberships after migration.
+
+No unrestricted system-wide Django superuser account or SUPERADMIN
+business role may remain in the target system. This requirement does
+not authorize a production account change during discovery or
+documentation work.
+
 # 10. DATA QUALITY ASSESSMENT
 
 Assess the source data before migration.
