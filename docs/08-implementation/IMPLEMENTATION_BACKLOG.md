@@ -1147,6 +1147,8 @@ Acceptance criteria:
 
 ## EPIC E24 — Landed cost engine
 
+**Priority:** P0 — Release-critical financial control.
+
 ### WP-E24-001 — Implement cost component model
 
 - Purchase value.
@@ -1257,11 +1259,13 @@ Acceptance criteria:
 
 # 13. PHASE 8 — FINANCE AND ACCOUNTING
 
-**Priority:** P1
+**Priority:** P0 foundation / P1 extended finance
 
 Objective: Deliver an integrated double-entry financial platform.
 
 ## EPIC E27 — General ledger
+
+**Priority:** P0 — Core accounting foundation.
 
 ### WP-E27-001 — Implement chart of accounts
 
@@ -1298,6 +1302,8 @@ Acceptance criteria:
 - Financial statements reconcile to ledger data.
 
 ## EPIC E28 — Accounts payable and receivable
+
+**Priority:** P1 — Extended finance operations.
 
 ### WP-E28-001 — Implement accounts payable
 
@@ -1682,9 +1688,9 @@ flowchart TD
     C --> D[Phase 3: Shared Business Platform]
     D --> E[Phase 4: Commercial Operations]
     D --> F[Phase 5: AI and War Room]
-    E --> G[Phase 6: Procurement and Import]
+    E --> G[Phase 6: Procurement, Import and Landed Cost]
     F --> E
-    G --> H[Phase 7: Inventory and Landed Cost]
+    G --> H[Phase 7: Inventory and Warehouse]
     H --> I[Phase 8: Finance and Accounting]
     D --> J[Phase 9: Corporate Operations]
     I --> K[Phase 10: Intelligence]
@@ -1712,8 +1718,9 @@ calendar schedule.
 | Tender and commercial operations | P1 | 4 |
 | AI and War Room | P1 | 5 |
 | Procurement and import | P1 | 6 |
-| Inventory and landed cost | P1 | 7 |
-| Finance and accounting | P1 | 8 |
+| Landed cost engine (E24) | P0 | 6 |
+| Inventory and warehouse (E25) | P1 | 7 |
+| Finance and accounting (E27) | P0 | 8 |
 | Corporate operations | P2 | 9 |
 | BI and optimization | P2/P3 | 10 |
 | Migration and acceptance | P0 | 11 |
