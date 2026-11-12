@@ -820,6 +820,63 @@ Acceptance criteria:
 - Permissions are enforced.
 - Forecasts are distinguished from actual results.
 
+## 24.1 Group-reporting grant acceptance
+
+Validate the separate group-reporting authorization model using
+controlled test users and approved test-company data.
+
+### Positive authorization scenarios
+
+1. A user with an active YAH-only group-reporting grant can access
+   approved aggregate reports for YAH.
+2. A user with an active CHI-only grant can access approved aggregate
+   reports for CHI.
+3. A user with an active YAH-and-CHI grant can access approved
+   consolidated reports covering both companies.
+4. Access is limited to the report definitions, metrics and data
+   categories specified in the grant.
+5. Company-level reporting remains available according to normal
+   company membership and permissions.
+
+### Negative authorization scenarios
+
+1. A user without an active group-reporting grant cannot access
+   consolidated group reports.
+2. A YAH-only grant cannot retrieve or include CHI data.
+3. A CHI-only grant cannot retrieve or include YAH data.
+4. An expired, suspended or revoked grant cannot authorize new
+   report executions or exports.
+5. A grant cannot authorize an unapproved report definition,
+   metric, data category or company.
+6. A group-reporting grant cannot provide transaction-level,
+   row-level, identifiable source-record or document access.
+7. A group-reporting grant cannot authorize operational changes,
+   approvals or other business transactions.
+8. A user cannot expand company scope by changing request parameters,
+   API payloads, filters or company identifiers.
+
+### Execution, export and lifecycle scenarios
+
+- Company and report-scope filters are enforced server-side before
+  aggregation.
+- Cached reports, snapshots, exports and scheduled or background
+  report jobs revalidate the applicable grant and scope.
+- Revocation or expiry prevents subsequent access to protected
+  generated reports and exports.
+- Grant creation, approval, modification, suspension, expiry,
+  revocation, report execution and denied access are auditable.
+- Grant authorization does not create company memberships,
+  operational permissions or Company ADMIN privileges.
+- Access to transaction-level drill-down requires normal active
+  company membership and applicable permissions.
+
+Acceptance evidence must identify the test user, grant status,
+permitted companies, report scope, requested operation and result.
+
+All scenarios must use controlled test data. No production grant,
+membership or business-record changes are authorized by these
+acceptance scenarios.
+
 # 25. INTEGRATION ACCEPTANCE
 
 Validate interactions between:

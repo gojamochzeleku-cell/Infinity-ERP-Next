@@ -621,6 +621,60 @@ Report categories:
 
 Financial reports must use posted accounting records.
 
+## 14.1 Group reporting authorization architecture
+
+Group reporting must use a dedicated, governed reporting-access
+path. It must not bypass the normal authorization service or company
+data-isolation controls.
+
+The logical request flow is:
+
+1. Authenticate the requesting user and verify that the account is active.
+2. Check the `reports.group_view` permission.
+3. Retrieve and validate a separate active group-reporting grant.
+4. Resolve the exact companies, report categories, metrics and data
+   fields authorized by that grant.
+5. Apply company and data-scope restrictions in the backend query
+   layer before aggregation.
+6. Execute only approved reporting definitions against authorized
+   reporting views, controlled query services or analytical models.
+7. Return aggregate results with their actual company scope and
+   reporting metadata.
+8. Record the execution and outcome in the audit trail.
+
+The group-reporting grant is independent of CompanyMembership and
+CompanyRoleAssignment. It must never create company membership,
+operational permissions or company administration privileges.
+
+The reporting architecture must enforce the following boundaries:
+
+- A role containing `reports.group_view` permission does not by
+  itself authorize cross-company reporting; an active, separately
+  scoped grant is mandatory.
+- The requested company set must be contained in the grant's
+  authorized company set.
+- Requested report definitions, metrics and data categories must
+  be within the grant's approved reporting scope.
+- Company filters must be enforced server-side before aggregation.
+  Frontend filters, hidden navigation items and client-supplied
+  company identifiers are not authorization controls.
+- Group reporting is read-only and limited to approved aggregate
+  information.
+- Transaction-level drill-down, identifiable operational records
+  and source documents require normal membership and permissions
+  in each relevant company.
+- Report APIs, exports, downloads, scheduled reports, background
+  jobs and cached results must enforce the same grant and scope.
+- Grant expiry, suspension or revocation must prevent subsequent
+  access and report generation under that grant. Cached and
+  previously generated artifacts must remain protected against
+  unauthorized access under their recorded scope and retention rules.
+- Grant creation, approval, modification, expiry, revocation,
+  execution and denied access must be auditable.
+
+The reporting service must not provide an alternate route to
+operational services or permit changes to source business records.
+
 Reports must identify:
 
 - Company scope.
@@ -628,6 +682,9 @@ Reports must identify:
 - Currency.
 - Data status.
 - Calculation definition.
+- Whether the result is company-level or consolidated.
+- The applicable reporting scope or grant reference, where
+  appropriate.
 
 # 15. DEPLOYMENT ARCHITECTURE
 

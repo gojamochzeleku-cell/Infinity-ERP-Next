@@ -285,6 +285,7 @@ Suggested permission naming:
 - document.upload
 - document.delete
 - reports.view
+- reports.group_view
 - users.manage
 - memberships.manage
 - roles.assign
@@ -371,6 +372,67 @@ it must use explicit intercompany records and authorization rules.
 
 Intercompany visibility must not create unrestricted access to the
 other company's operational data.
+
+## 8.5 Authorized group reporting
+
+Group reporting is a narrowly scoped, read-only reporting capability.
+It is not a general cross-company membership or operational-access
+mechanism.
+
+A user may access consolidated reporting only through an explicit,
+active group-reporting grant that is separate from CompanyMembership.
+
+Each grant must define:
+
+- The user receiving the grant.
+- The exact companies included in the permitted reporting scope.
+- Grant status and effective dates.
+- The authorized reporting capability and approved data scope.
+- The authorized grantor and approval reference.
+- Creation, modification, expiry, and revocation history.
+
+Authorization requirements:
+
+1. The user must be authenticated and the account must be active.
+2. The user must hold the `reports.group_view` permission. This
+   permission may be assigned through an authorized role, but it does
+   not independently grant cross-company reporting access. A separate,
+   active group-reporting grant is mandatory and defines the permitted
+   companies and reporting scope.
+3. The requested company set must be a subset of the grant's active
+   company scope.
+4. The requested report, metrics, and data categories must be within
+   the approved reporting scope.
+5. The backend must enforce company filters before aggregation.
+   Frontend filtering is not an authorization control.
+6. Reports and exports must contain only authorized aggregate data
+   and must identify their included company scope.
+7. The capability is read-only. It must not permit creating,
+   modifying, approving, posting, deleting, or administering
+   operational records.
+8. A report link, export, cached result, scheduled report, or
+   background job must not bypass the original grant and scope checks.
+9. Revocation or expiry must prevent subsequent access and generation
+   of reports under that grant. Previously generated artifacts must
+   remain protected by their recorded authorization scope and
+   retention policy.
+10. Drilling down to company-level transactions, documents, or
+    identifiable operational records requires normal active
+    membership and permissions in the relevant company.
+
+Grant governance:
+
+- Grant creation, approval, modification, and revocation must be
+  restricted to explicitly designated and authorized grantors.
+- A Company ADMIN must not acquire group-wide grant authority merely
+  from company ADMIN status.
+- Every grant must have a documented business justification and
+  approval reference.
+- No unrestricted system-wide administrator or SUPERADMIN role may
+  be used to issue or bypass group-reporting grants.
+
+A group-reporting grant must never create a CompanyMembership,
+CompanyRoleAssignment, or operational permission in another company.
 
 # 9. COMPANY CONTEXT SWITCHING
 
@@ -619,6 +681,12 @@ Record security-relevant events, including:
 - Financial posting and reversal.
 - Approval and rejection.
 - Export of sensitive information.
+- Group-reporting grant creation, approval, modification, expiry,
+  and revocation.
+- Group-report execution and export, including actor, grant,
+  requested company scope, actual company scope, report definition,
+  and outcome.
+- Denied group-reporting access and out-of-scope company requests.
 - Security configuration changes.
 - Failed authorization attempts.
 
@@ -899,6 +967,12 @@ Verification should cover:
 ## Role and permission enforcement
 - Company ADMIN boundaries.
 - Finance permissions.
+- Group-reporting grant creation and revocation authority.
+- Group-reporting access with an active grant.
+- Requests containing companies outside the grant scope.
+- Expired, suspended, or revoked group-reporting grants.
+- Attempts to modify operational records through group-reporting access.
+- Drill-down attempts without normal company membership.
 - Procurement permissions.
 - HR and payroll restrictions.
 - Approval authority.
@@ -916,6 +990,9 @@ Verification should cover:
 - Authentication events.
 - Membership changes.
 - Role changes.
+- Group-reporting grant lifecycle events.
+- Group-report executions and exports with authorized company scope.
+- Denied and out-of-scope group-reporting requests.
 - Sensitive exports.
 - Approval events.
 - Security configuration changes.

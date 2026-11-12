@@ -997,6 +997,110 @@ Reporting should use approved query services, reporting views or controlled anal
 
 Heavy analytical queries must not compromise operational transaction performance.
 
+## 20.1 Group-reporting authorization entities
+
+The following proposed entities provide a separate authorization model
+for consolidated group reporting.
+
+### GroupReportingGrant
+
+Represents an explicit, revocable authorization for a user to access
+approved consolidated reporting.
+
+Proposed attributes:
+
+- id
+- user_id
+- status
+- valid_from
+- valid_until
+- business_justification
+- approval_reference
+- granted_by_user_id
+- approved_at
+- created_at
+- updated_at
+- revoked_at
+- revoked_by_user_id
+- revocation_reason
+
+A grant must have an identifiable recipient, authorized grantor,
+approval reference, effective period and status.
+
+The lifecycle must distinguish pending, active, suspended, expired
+and revoked states. Approval must be performed by an authorized
+approver other than the grant recipient or original requester.
+Only an approved grant within its effective period may become active.
+
+### GroupReportingGrantCompany
+
+Defines the exact companies covered by a grant.
+
+Proposed attributes:
+
+- id
+- group_reporting_grant_id
+- company_id
+- created_at
+
+Each grant must explicitly list its permitted companies. A company
+not listed in this entity is outside the grant's authorization scope.
+
+### GroupReportingGrantReportScope
+
+Defines which reporting capabilities are permitted by a grant.
+
+Proposed attributes:
+
+- id
+- group_reporting_grant_id
+- report_definition_id
+- permitted_metrics
+- permitted_data_categories
+- aggregation_level
+- created_at
+
+Only approved report definitions, metrics and data categories may
+be exposed through the grant.
+
+The aggregation level must be restricted to approved aggregate
+outputs, such as summaries and grouped totals. Its allowed values
+must be defined by the reporting policy and must exclude row-level,
+transaction-level and identifiable-record output. Row-level records,
+individual transactions, identifiable source records and operational
+drill-down must not be authorized by this entity. Any minimum group-size
+or disclosure-control threshold must follow the approved reporting
+policy.
+
+### Entity constraints and authorization rules
+
+- GroupReportingGrant references User, not CompanyMembership.
+- Grant creation and approval must be attributable to authorized
+  users and recorded in the audit trail.
+- GroupReportingGrantCompany must have a unique constraint on
+  (group_reporting_grant_id, company_id).
+- GroupReportingGrantReportScope must prevent duplicate scope
+  entries for the same grant and report definition.
+- Company scope must be checked against active companies and the
+  approved grant scope before report execution.
+- Grant status and validity dates must be checked at execution time.
+- Expired, suspended or revoked grants must not authorize new
+  report executions or exports.
+- A grant must not create or modify CompanyMembership,
+  MembershipRoleAssignment, RolePermission or operational records.
+- Group-reporting permission remains a separate permission check;
+  permission assignment alone does not create a reporting grant.
+- Generated reports, snapshots, exports and scheduled jobs must
+  retain the applicable grant and company-scope references so that
+  access can be revalidated.
+- Grant creation, approval, modification, expiry, revocation,
+  execution and denied access must be recorded through the existing
+  AuditLog and SecurityEvent mechanisms.
+
+These entities define a logical data model. Physical field types,
+foreign-key behavior, indexes and retention rules must be finalized
+during detailed schema design.
+
 # 21. AUDIT AND SYSTEM CONTROL
 
 Proposed entities:
@@ -1092,6 +1196,21 @@ Audit records must be protected against unauthorized modification.
 - AIRun 1:N AIEvidence.
 - AIRun 1:N AIResponse.
 - AIArtifact 1:N AIArtifactVersion.
+
+## 22.7 Group reporting
+
+- User 1:N GroupReportingGrant as grant recipient.
+- User 1:N GroupReportingGrant as grantor.
+- User 1:N GroupReportingGrant as revoking user.
+- GroupReportingGrant 1:N GroupReportingGrantCompany.
+- Company 1:N GroupReportingGrantCompany.
+- GroupReportingGrant 1:N GroupReportingGrantReportScope.
+- ReportDefinition 1:N GroupReportingGrantReportScope.
+
+GroupReportingGrantCompany is the explicit company-scope
+relationship. GroupReportingGrantReportScope defines the permitted
+reporting scope. Neither relationship creates company membership
+or operational permissions.
 
 # 23. SIMPLIFIED ENTITY RELATIONSHIP DIAGRAM
 

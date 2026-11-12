@@ -73,7 +73,7 @@ An observed feature is not automatically considered complete, reliable or accept
 | BR-ORG-003 | The system shall support adding future companies without redesigning the platform. | P1 | Proposed |
 | BR-ORG-004 | Users shall have explicit memberships in the companies they are authorized to access. | P0 | Confirmed |
 | BR-ORG-005 | A user's role in one company shall not automatically grant authority in another company. | P0 | Confirmed |
-| BR-ORG-006 | Authorized group reporting shall consolidate data without bypassing company access controls. | P0 | Proposed |
+| BR-ORG-006 | Group reporting shall require a separate, explicit, active and revocable grant defining the permitted companies and reporting scope; it shall not grant company membership or operational access. | P0 | Proposed |
 | BR-ORG-007 | Company-specific settings, numbering and approval rules shall be configurable. | P1 | Proposed |
 | BR-ORG-008 | Intercompany transactions shall be separately identifiable and auditable. | P1 | Proposed |
 
@@ -82,7 +82,11 @@ Acceptance criteria:
 - A user without membership in a company cannot read or modify that company's records.
 - Company switching changes the server-validated authorization context.
 - Company-specific records remain isolated in lists, details, exports, search and downloads.
-- Authorized consolidated reporting includes only companies the user is permitted to view.
+- Consolidated reporting requires an active group-reporting grant separate from company membership.
+- The requested companies and report categories must fall within that grant's approved scope.
+- Group-reporting grants authorize read-only aggregate reporting and do not create company memberships or operational permissions.
+- Access to company transactions, identifiable records or operational documents requires normal active membership and permissions in that company.
+- Grant expiry or revocation prevents subsequent report access and generation under that grant.
 - Intercompany transactions retain both company references and appropriate accounting treatment.
 
 ## 3.2 Identity, roles and authorization
@@ -362,7 +366,7 @@ Acceptance criteria:
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
 | BR-REP-001 | Management dashboards shall be company-scoped. | P0 | Proposed |
-| BR-REP-002 | Authorized group dashboards shall consolidate approved company data. | P1 | Proposed |
+| BR-REP-002 | Authorized group dashboards shall consolidate only approved aggregate company data under an active group-reporting grant. | P1 | Proposed |
 | BR-REP-003 | Reports shall identify reporting period and currency. | P0 | Proposed |
 | BR-REP-004 | Reports shall be traceable to source transactions. | P1 | Proposed |
 | BR-REP-005 | Reports shall support PDF, DOCX and XLSX where appropriate. | P1 | Observed |
@@ -375,6 +379,10 @@ Acceptance criteria:
 - A report's totals can be traced to source records.
 - Financial report totals reconcile with posted accounting data.
 - Unauthorized users cannot export data outside their company scope.
+- Group dashboards and exports identify the companies included in the report.
+- Group reports enforce the grant's company and reporting scope before aggregation.
+- Cached, scheduled and background-generated reports revalidate the grant and its scope.
+- Group-reporting access does not permit operational changes or transaction-level drill-down without normal company authorization.
 
 # 4. CROSS-CUTTING NON-FUNCTIONAL REQUIREMENTS
 
@@ -454,7 +462,7 @@ The following questions must be answered during discovery. They must not be sile
 
 - What is the approved legal and operational company hierarchy?
 - Which users need access to both YAH and CHI?
-- Which reports may be consolidated across companies?
+- Which report categories, metrics and data fields may be consolidated across companies, and who is authorized to approve and revoke those grants?
 - Are intercompany sales, purchases, loans or shared expenses required?
 
 ## 7.2 Accounting
