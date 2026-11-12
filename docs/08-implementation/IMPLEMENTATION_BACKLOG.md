@@ -1461,15 +1461,63 @@ Objective: Deliver enterprise reporting, analytics, and optimization.
 
 ### WP-E35-001 — Implement reporting framework
 
+- Implement approved reporting query services and reporting views.
+- Define controlled report definitions and metric calculations.
+- Enforce company context and data ownership.
+
 ### WP-E35-002 — Implement report permissions
 
+- Implement company-scoped report permissions.
+- Implement the separate group-reporting permission check.
+- Keep group-reporting permission assignment separate from grant creation.
+- Deny access when either required authorization check fails.
+
 ### WP-E35-003 — Implement export services
+
+- Implement permission-controlled report exports.
+- Revalidate grant status, validity period, company scope and report scope
+  before export generation and subsequent protected access.
+- Apply the same controls to cached reports, snapshots and scheduled jobs.
+
+### WP-E35-004 — Implement group-reporting grant lifecycle
+
+- Implement GroupReportingGrant management.
+- Support pending, active, suspended, expired and revoked states.
+- Enforce authorized approval separate from the grant recipient
+  and original requester.
+- Record grant creation, approval, modification, suspension,
+  expiry and revocation.
+- Preserve grantor, approver, recipient and revoking-user references.
+- Ensure grants never create company memberships or operational permissions.
+
+### WP-E35-005 — Implement group-reporting scope enforcement
+
+- Implement explicit company scope through GroupReportingGrantCompany.
+- Implement report, metric and data-category scope through
+  GroupReportingGrantReportScope.
+- Enforce approved aggregate-only output.
+- Reject unlisted companies, report definitions, metrics and
+  data categories.
+- Prevent transaction-level, row-level, identifiable-record and
+  operational drill-down access.
+- Revalidate authorization for report execution, exports,
+  cached results, snapshots and background jobs.
+- Require normal company membership and permissions for
+  company-level transaction drill-down.
 
 Acceptance criteria:
 
 - Reports respect company isolation.
-- Report definitions are traceable.
-- Exports are permission-controlled.
+- Report definitions and metric calculations are traceable.
+- Company-level and group-reporting permissions are independently enforced.
+- Only explicitly granted companies and reporting scopes are accessible.
+- Grant approval, lifecycle changes, executions, exports and denied
+  access are auditable.
+- Expired, suspended and revoked grants cannot authorize protected access.
+- Group-reporting grants never provide operational permissions,
+  company ADMIN privileges or unrestricted source-record access.
+- Exports and generated report artifacts retain authorization references
+  so access can be revalidated.
 
 ## EPIC E36 — Executive command center
 
