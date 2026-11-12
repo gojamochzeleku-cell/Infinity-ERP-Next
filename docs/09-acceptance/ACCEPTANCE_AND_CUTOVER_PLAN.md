@@ -842,18 +842,26 @@ controlled test users and approved test-company data.
 
 1. A user without an active group-reporting grant cannot access
    consolidated group reports.
-2. A YAH-only grant cannot retrieve or include CHI data.
-3. A CHI-only grant cannot retrieve or include YAH data.
-4. An expired, suspended or revoked grant cannot authorize new
+2. A user with `reports.group_view` permission but without an active
+   group-reporting grant cannot access consolidated group reports.
+3. A user with an active group-reporting grant but without the
+   `reports.group_view` permission cannot access consolidated group reports.
+4. The grant recipient cannot approve their own group-reporting grant.
+5. The original grant requester cannot approve that grant.
+6. A grant cannot become active without approval by an independently
+   authorized approver.
+7. A YAH-only grant cannot retrieve or include CHI data.
+8. A CHI-only grant cannot retrieve or include YAH data.
+9. An expired, suspended or revoked grant cannot authorize new
    report executions or exports.
-5. A grant cannot authorize an unapproved report definition,
-   metric, data category or company.
-6. A group-reporting grant cannot provide transaction-level,
-   row-level, identifiable source-record or document access.
-7. A group-reporting grant cannot authorize operational changes,
-   approvals or other business transactions.
-8. A user cannot expand company scope by changing request parameters,
-   API payloads, filters or company identifiers.
+10. A grant cannot authorize an unapproved report definition,
+    metric, data category or company.
+11. A group-reporting grant cannot provide transaction-level,
+    row-level, identifiable source-record or document access.
+12. A group-reporting grant cannot authorize operational changes,
+    approvals or other business transactions.
+13. A user cannot expand company scope by changing request parameters,
+    API payloads, filters or company identifiers.
 
 ### Execution, export and lifecycle scenarios
 
