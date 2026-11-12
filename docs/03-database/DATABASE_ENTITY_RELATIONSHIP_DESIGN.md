@@ -886,17 +886,20 @@ Document access must validate both company ownership and business-record permiss
 
 # 17. AI AND DOCUMENT INTELLIGENCE
 
-Proposed entities:
+Proposed canonical entities:
 
 - AIProvider
+- AIProviderCapability
 - AIModel
 - AIProviderConfiguration
 - AIUsagePolicy
+- AITask
 - AIJob
 - AIRun
 - AIPromptTemplate
 - AIPromptVersion
 - AIResponse
+- AIOutputValidation
 - AIEvidence
 - AIResearchSource
 - AIExtractionResult
@@ -907,6 +910,29 @@ Proposed entities:
 - AIUsageRecord
 - AIQuotaSnapshot
 - AIErrorLog
+- DocumentExtraction
+- DocumentPageExtraction
+- DocumentChunk
+- OCRJob
+- ResearchRequest
+- ProviderHealthEvent
+
+These names form the canonical logical model for AI and document
+intelligence. Provider-specific implementations must map to these
+entities rather than introduce competing names for the same concept.
+
+Entity responsibilities:
+
+- AIRun is the canonical AI execution record.
+- AIResponse stores normalized model responses.
+- AIExtractionResult stores structured information extracted
+  or interpreted from AI responses.
+- DocumentExtraction stores extracted document content and metadata.
+- DocumentPageExtraction stores page-level extraction results.
+- DocumentChunk stores traceable segments of extracted content.
+- AIResearchSource is the canonical research-source record.
+- AIOutputValidation stores structured-output validation results.
+- OCRJob tracks OCR processing independently from general AI runs.
 
 AI execution records should preserve:
 
@@ -1189,13 +1215,88 @@ Audit records must be protected against unauthorized modification.
 
 ## 22.6 Documents and AI
 
+Document relationships:
+
 - Company 1:N Document.
 - Document 1:N DocumentVersion.
 - Document 1:N DocumentLink.
+- Document 1:N DocumentExtraction.
+- DocumentExtraction 1:N DocumentPageExtraction.
+- DocumentExtraction 1:N DocumentChunk.
+- Document 1:N OCRJob.
+- OCRJob 1:N DocumentPageExtraction.
+
+AI provider and execution relationships:
+
+- AIProvider 1:N AIModel.
+- AIProvider 1:N AIProviderCapability.
+- AIProvider 1:N AIProviderConfiguration.
+- AIProvider 1:N ProviderHealthEvent.
+- AIModel 1:N AIRun.
+- AITask 1:N AIJob.
 - AIJob 1:N AIRun.
-- AIRun 1:N AIEvidence.
 - AIRun 1:N AIResponse.
+- AIRun 1:N AIExtractionResult.
+- AIRun 1:N AIOutputValidation.
+- AIRun 1:N AIEvidence.
+- AIRun 1:N AIUsageRecord.
+- AIRun 1:N AIErrorLog.
+- AIPromptTemplate 1:N AIPromptVersion.
+- AIPromptVersion 1:N AIRun.
 - AIArtifact 1:N AIArtifactVersion.
+- AIRun 1:N AIReview.
+- AIReview 1:N AIApproval as its approval history.
+- AIRun 1:N AIArtifact.
+- AIReview 1:N AIArtifact where an artifact is produced from a review.
+- CompanyMembership 1:N AIReview as reviewer.
+- CompanyMembership 1:N AIApproval as approver.
+- Company 1:N AIProviderConfiguration for company-specific configuration.
+- Company 1:N AIUsagePolicy.
+- AIProvider 1:N AIUsagePolicy.
+- AIModel 1:N AIUsagePolicy where a policy is model-specific.
+- AITask 1:N AIUsagePolicy where a policy is task-specific.
+- AIProvider 1:N AIQuotaSnapshot.
+- AIModel 1:N AIQuotaSnapshot where a snapshot is model-specific.
+- AIUsagePolicy 1:N AIQuotaSnapshot where a snapshot records policy usage.
+
+Review and approval records must preserve their acting company
+membership, decision, timestamp, comments and relevant source
+references. Approval decisions must remain distinct from review
+actions and must not replace normal ERP workflow approvals.
+
+AIArtifact must retain its originating AIRun. When an artifact
+results from a human review or approval, it must also retain the
+relevant review or approval reference. Artifact versions must
+preserve their version history and source traceability.
+
+AIProviderConfiguration must explicitly identify its configuration
+scope. Company-specific configuration must reference its owning
+Company; platform-managed configuration must not imply user access
+or operational privileges.
+
+AIUsagePolicy must identify its applicable company and provider
+scope, with optional model and task restrictions. AIQuotaSnapshot
+must retain its provider, applicable model or policy scope where
+relevant, and observation period. Historical snapshots must not
+be overwritten by later observations.
+
+Research relationships:
+
+- ResearchRequest 1:N AIResearchSource.
+- ResearchRequest 1:N AIRun.
+- AIResearchSource 1:N AIEvidence.
+
+
+DocumentExtraction represents source-document extraction.
+AIExtractionResult represents structured AI-produced extraction
+and must retain its source AIRun and evidence references.
+DocumentPageExtraction and DocumentChunk must retain stable
+document and extraction references so every result remains traceable
+to its original source.
+
+These relationships do not grant access to documents or business
+records. Existing company ownership, membership, record permissions
+and document-access controls remain mandatory.
 
 ## 22.7 Group reporting
 

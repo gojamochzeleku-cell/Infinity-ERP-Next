@@ -380,6 +380,12 @@ Suggested fields:
 
 Secrets must not be stored directly in ordinary provider records.
 
+Provider configuration must have an explicit scope: platform-managed
+or company-specific. Company-specific settings must remain isolated
+to their owning company. Configuration records must be versioned or
+otherwise historically traceable without storing secret values
+directly in ordinary database records.
+
 The registry must allow a provider to be disabled without
 changing business-module code.
 
@@ -488,6 +494,12 @@ Maintain usage records containing:
 - Success or failure.
 - Quota information where available.
 - Request correlation identifier.
+
+Quota policies must identify their applicable company and provider
+scope, with optional model- or task-specific restrictions. Quota
+snapshots must identify the provider, applicable model or policy
+where relevant, and the observation period. Preserve historical
+snapshots rather than overwriting earlier observations.
 
 ## 14.4 Quota behavior
 
@@ -842,6 +854,16 @@ Review metadata should contain:
 - Source evidence.
 - Processing version.
 
+Persist review actions separately from approval decisions. Each
+review and approval must identify the acting company membership,
+decision, timestamp and relevant comments or evidence references.
+Approval for workflow use is an AI-result governance decision only;
+it does not replace the ERP's normal workflow approval authority.
+
+An AI artifact produced from a run or review must retain its
+originating run and, where applicable, its review or approval
+references. Artifact versions must remain traceable to that source.
+
 AI must not independently:
 
 - Submit a tender.
@@ -1069,33 +1091,51 @@ of provider credentials or internal secrets.
 
 # 31. AI DATABASE DESIGN INPUTS
 
-The following entities should be considered during detailed
-database implementation:
+The following canonical entities are defined in the database
+design and must be used during detailed implementation:
 
 1. AIProvider
-2. AIModel
-3. AIProviderCapability
-4. AIQuotaSnapshot
-5. AIUsageRecord
+2. AIProviderCapability
+3. AIModel
+4. AIProviderConfiguration
+5. AIUsagePolicy
 6. AITask
 7. AIJob
-8. AIPromptTemplate
-9. AIPromptVersion
-10. AIProcessingRun
-11. AIProcessingResult
+8. AIRun
+9. AIPromptTemplate
+10. AIPromptVersion
+11. AIResponse
 12. AIOutputValidation
-13. AIReview
-14. AIEvidenceReference
-15. DocumentExtraction
-16. DocumentPageExtraction
-17. DocumentChunk
-18. OCRJob
-19. ResearchRequest
-20. ResearchSource
-21. ProviderHealthEvent
+13. AIEvidence
+14. AIResearchSource
+15. AIExtractionResult
+16. AIReview
+17. AIApproval
+18. AIArtifact
+19. AIArtifactVersion
+20. AIUsageRecord
+21. AIQuotaSnapshot
+22. AIErrorLog
+23. DocumentExtraction
+24. DocumentPageExtraction
+25. DocumentChunk
+26. OCRJob
+27. ResearchRequest
+28. ProviderHealthEvent
 
-These are proposed logical entities. Their final schema must
-be reconciled with the database design and implementation architecture.
+Canonical naming rules:
+
+- AIProcessingRun is represented by AIRun.
+- AIProcessingResult is represented by AIResponse.
+- AIEvidenceReference is represented by AIEvidence.
+- ResearchSource is represented by AIResearchSource.
+- AIExtractionResult is distinct from DocumentExtraction:
+  the former stores structured AI-produced results, while the
+  latter stores content extracted from the original document.
+
+Do not introduce alternate entity names for these same concepts.
+Any future entity addition or rename must be reflected in both
+this document and the database design.
 
 # 32. AI ACCEPTANCE CRITERIA
 
